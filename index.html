@@ -1,64 +1,314 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محمد البوزيدي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            padding: 0;
+            font-family: 'Arial', sans-serif;
             background-color: #121212;
-            font-family: 'Tahoma', sans-serif;
-            color: #ffffff;
+            color: #fff;
             text-align: center;
-            direction: rtl;
+            position: relative;
+            overflow-x: hidden;
         }
-        .container {
-            padding: 40px 20px;
+
+        .cover {
+            width: 100%;
+            height: 30vh;
+            background-image: url('cover.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-        .avatar {
+
+        canvas#stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .profile {
+            margin-top: -75px;
+        }
+
+        .profile img {
             width: 150px;
             height: 150px;
+            border: 5px solid #222;
             border-radius: 50%;
-            border: 3px solid #3498db;
-            margin-bottom: 20px;
+            object-fit: cover;
         }
+
         h1 {
-            margin: 10px 0;
-            font-size: 2.5em;
+            margin: 10px 0 0 0;
         }
-        p {
-            font-size: 1.2em;
-            margin: 5px 0;
-        }
-        .links a {
+
+        .typewriter {
             display: inline-block;
-            margin: 10px 15px;
-            padding: 10px 20px;
-            border-radius: 30px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.3s;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: .15em solid #00bcd4;
+            animation: typing 4s steps(40, end), blink .75s step-end infinite;
+            font-size: 18px;
+            color: #ccc;
+            margin-top: 5px;
         }
-        .links a:hover {
-            background-color: #2980b9;
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent
+            }
+        }
+
+        .buttons {
+            margin: 30px 0;
+        }
+
+        .buttons a {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .buttons a::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 100%;
+            width: 100%;
+            height: 100%;
+            background-color: #00bcd4;
+            transition: right 0.4s;
+            z-index: -1;
+        }
+
+        .buttons a:hover::before {
+            right: 0;
+        }
+
+        .buttons a:hover {
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00bcd4;
+        }
+
+        .buttons a span.ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .reactions {
+            font-size: 28px;
+            margin-top: 40px;
+            animation: float 3s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .top-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            .profile img {
+                width: 100px;
+                height: 100px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .typewriter {
+                font-size: 16px;
+            }
+
+            .buttons a {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <img src="https://i.imgur.com/JPqKxvT.png" alt="avatar" class="avatar">
-        <h1>محمد البوزيدي</h1>
-        <p>طالب طيران ✈️ | مبرمج 💻 | مهتم بالأمن السيبراني 🔐</p>
-        <p>أطمح أن أكون كابتن طيار 👨‍✈️</p>
-        <div class="links">
-            <a href="#">واتساب</a>
-            <a href="#">فيسبوك</a>
-            <a href="#">البريد الإلكتروني</a>
-        </div>
+    <!-- صوت الطائرة -->
+    <audio id="introSound" autoplay>
+        <source src="airplane.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- خلفية النجوم -->
+    <canvas id="stars"></canvas>
+
+    <!-- الغلاف -->
+    <div class="cover"></div>
+
+    <!-- صورة الملف الشخصي -->
+    <div class="profile">
+        <img src="profile.jpg" alt="Profile">
     </div>
+
+    <!-- الاسم والوصف -->
+    <h1>محمد البوزيدي</h1>
+    <p class="typewriter">طالب طيران ✈️ | مبرمج 💻 | مهتم بالأمن السيبراني 🔒</p>
+
+    <!-- الأزرار -->
+    <div class="buttons">
+        <a href="https://www.facebook.com/profile.php?id=61563835990284" target="_blank">فيسبوك</a>
+        <a href="https://vm.tiktok.com/ZMHpC7yhXG2dX-JPRSX/" target="_blank">تيك توك</a>
+        <a href="http://t.me/Boz79" target="_blank">تلغرام</a>
+        <a href="https://wa.me/qr/LS7LFF4EZWUII1" target="_blank">واتساب</a>
+        <a href="mailto:buzidi99@gmail.com">البريد الإلكتروني</a>
+    </div>
+
+    <!-- رموز -->
+    <div class="reactions">
+        ❤️ 😊 ✈️ 👨‍✈️ 💻 🔒
+    </div>
+
+    <!-- زر العودة للأعلى -->
+    <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="top-btn">⬆️</button>
+
+    <!-- السكربتات -->
+    <script>
+        // خلفية النجوم
+        const canvas = document.getElementById("stars");
+        const ctx = canvas.getContext("2d");
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        let stars = [];
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.5,
+                d: Math.random() * 100
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ffffff";
+            for (let i = 0; i < stars.length; i++) {
+                let s = stars[i];
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2, true);
+                ctx.fill();
+            }
+            moveStars();
+        }
+
+        let angle = 0;
+        function moveStars() {
+            angle += 0.01;
+            for (let i = 0; i < stars.length; i++) {
+                stars[i].y += Math.cos(angle + stars[i].d) + 1;
+                stars[i].x += Math.sin(angle) * 0.3;
+
+                if (stars[i].y > canvas.height) {
+                    stars[i].y = 0;
+                    stars[i].x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        setInterval(drawStars, 33);
+
+        // زر للأعلى
+        window.onscroll = function () {
+            const btn = document.querySelector('.top-btn');
+            btn.style.display = (window.scrollY > 300) ? 'block' : 'none';
+        };
+
+        // تأثير الموجة (Ripple)
+        document.querySelectorAll('.buttons a').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const circle = document.createElement('span');
+                circle.classList.add('ripple');
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                circle.style.left = `${x}px`;
+                circle.style.top = `${y}px`;
+                this.appendChild(circle);
+
+                setTimeout(() => {
+                    circle.remove();
+                }, 600);
+            });
+        });
+    </script>
 </body>
+
 </html>
